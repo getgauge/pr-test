@@ -6,23 +6,25 @@ on:
 
 jobs:
   build:
-    env:
-      GAUGEBOT_GITHUB_TOKEN: '${{ secrets.GAUGEBOT_GITHUB_TOKEN }}'
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'SkipRelease')
     name: Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup git
-        run: |
-          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
-          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Update README
         run: |
           git clean -dfx
           git checkout master && git checkout . && git pull --rebase
           echo Hello, world! >> README.md
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git commit -am "Updating README.md"
-          git push "https://gaugebot:$GAUGEBOT_GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" master
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GAUGEBOT_GITHUB_TOKEN }}
