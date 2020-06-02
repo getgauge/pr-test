@@ -25,4 +25,4 @@ jobs:
           git checkout master && git checkout . && git pull --rebase
           echo Hello, world! >> README.md
           git commit -am "Updating README.md"
-          git push "https://$GITHUB_ACTOR:$GAUGEBOT_GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" master
+          git push "https://gaugebot:$GAUGEBOT_GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" master
